@@ -1,0 +1,15 @@
+package aoc2023
+
+import scala.io.Source
+import zio.parser.Syntax
+import zio.Chunk
+
+abstract class AocTest extends munit.FunSuite:
+  self =>
+  val input: Seq[String] = Source.fromResource(self.getClass.getSimpleName + ".txt").getLines().toSeq
+object AocTest:
+  val intSyntax: Syntax[String, Char, Char, Int] = Syntax.digit.repeat.transform(
+    { case chars: Chunk[Char] => chars.mkString.toInt },
+    { case i: Int => Chunk.fromIterable(i.toString) },
+  )
+  val whiteSpaceSep = Syntax.whitespace.+.transform(_ => (), _ => Chunk.empty)
