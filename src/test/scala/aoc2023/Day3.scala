@@ -79,9 +79,9 @@ class Day3 extends AocTest:
 
     val numbersAdjacentToSymbolHits: Seq[IntHit] =
       intHits.filter { intHit =>
-        if intHit.n == 852 then println(intHit)
         symbolHits.exists(x => intHit.isAdjacentTo(x))
       }
+
     val gears =
       val possibleGears = symbolHits.filter(_.c == '*')
       possibleGears.map(pg => pg -> numbersAdjacentToSymbolHits.filter(_.isAdjacentTo(pg))).filter(_._2.size == 2).map {
