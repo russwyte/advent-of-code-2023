@@ -1,29 +1,25 @@
 package aoc2023
 
+import scala.math.*
+
 class Day6 extends AocTest:
   import Day6.*
-  def winningHoldsLooping(race: Race) =
+  def winningHoldsMap(race: Race) =
     val minWinningHold = race.distance
     val distances      = (1 to race.time.toInt).map(n => n -> n * (race.time - n))
     distances.filter((h, d) => d > race.distance).toMap
-  def margine(races: List[Race]) = races.map(winningHoldsLooping).map(_.size).reduce(_ * _)
+  def margine(races: List[Race]) = races.map(winningHoldsMap).map(_.size).reduce(_ * _)
 
-  def countWaysToWin(race: Race) = winningHoldsLooping(race).size
-
-  import scala.annotation.tailrec
-
-  // brutish - but I have work to do... so...
-  def countWaysToWin2(race: Race): Long =
-    @tailrec
-    def countWays(time: Long, count: Long): Long =
-      if time > race.time then count
-      else
-        val distance = time * (race.time - time)
-        if distance > race.distance then countWays(time + 1, count + 1)
-        else countWays(time + 1, count)
-
-    countWays(1, 0)
-  end countWaysToWin2
+  def countWaysToWin(race: Race): Long =
+    val a     = -1
+    val b     = race.time
+    val c     = -race.distance
+    val D     = sqrt(b * b - 4 * a * c)
+    val high  = ceil((-b - D) / (2 * a)).toLong
+    val low   = floor((-b + D) / (2 * a)).toLong + 1
+    val range = low until high
+    range.size
+  end countWaysToWin
 
   def winningHoldRange(race: Race): Range = ???
 
@@ -45,8 +41,8 @@ class Day6 extends AocTest:
     val dStr          = inputRaces.map(_.distance.toString()).mkString
     val tStr          = inputRaces.map(_.time.toString()).mkString
     val bigRacee      = Race(tStr.toLong, dStr.toLong)
-    val exampleRace   = countWaysToWin2(exampleRaces2(0))
-    val bigWays       = countWaysToWin2(bigRacee)
+    val exampleRace   = countWaysToWin(exampleRaces2(0))
+    val bigWays       = countWaysToWin(bigRacee)
     assertEquals(exampleRace, 71503L)
     assertEquals(bigWays, 30077773L)
 end Day6
