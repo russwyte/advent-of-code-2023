@@ -1,10 +1,10 @@
 package aoc2023
 import scala.collection.immutable.SortedSet
-import Range.*
 import javax.xml.transform.Source
 
 class Day5 extends AocTest:
   import Day5.*
+  import Range.*
   case class Chopped(adjusted: Option[Range], rest: SortedSet[Range])
   def chopAndMoveRange(range: Range, intersection: Range, difference: Long): Chopped =
     val start = math.max(range.start, intersection.start)
@@ -117,4 +117,34 @@ object Day5:
     (seeds, layers) => ParsedInput(Seeds(seeds), layers),
     input => (input.seeds.seeds, input.layers),
   )
+  enum Range:
+    def start: Long
+    def end: Long
+    assert(start < end, s"Invalid range: $toString")
+
+    // A range where the start is included and the end is excluded
+    case Exlusive(start: Long, end: Long)
+    // A range where the start is included and the end is also included
+    case Inclusive(start: Long, end: Long)
+  end Range
+
+  object Range:
+    opaque type RangedLong = Long
+    extension (r: RangedLong)
+      def until(end: Long): Range = Exlusive(r, end)
+      def to(end: Long): Range    = Inclusive(r, end)
+
+    def getExclusive(start: Long, end: Long): Option[Range.Exlusive] =
+      Option.when(start < end)(Range.Exlusive(start, end))
+    def getInclusive(start: Long, end: Long): Option[Range.Inclusive] =
+      Option.when(start <= end)(Range.Inclusive(start, end))
+
+    val r: Range = 1L until 10L
+    given Ordering[Range] with
+      def compare(a: Range, b: Range): Int =
+        a.start.compare(b.start) match
+          case 0 => a.end.compare(b.end)
+          case n => n
+    given Conversion[Long, RangedLong] = l => l: RangedLong
+  end Range
 end Day5
