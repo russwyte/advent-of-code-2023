@@ -117,7 +117,4 @@ object Day5:
     (seeds, layers) => ParsedInput(Seeds(seeds), layers),
     input => (input.seeds.seeds, input.layers),
   )
-  @main def check =
-    val s = scala.io.Source.fromResource("Day5.txt").mkString
-    println(parsedInputSyntax.parseString(s))
 end Day5
