@@ -2,6 +2,7 @@ package aoc2023
 import scala.collection.immutable.SortedSet
 import javax.xml.transform.Source
 import scala.collection.immutable.NumericRange.Exclusive
+import scala.annotation.tailrec
 
 class Day5 extends AocTest:
   import Day5.*
@@ -33,32 +34,32 @@ class Day5 extends AocTest:
       chopAndMoveRange(range, mask, start - range.start)
   case class Layer(ranges: List[RangeMapping]):
     def move(range: Exclusive[Long]): SortedSet[Exclusive[Long]] =
-      var remaining = SortedSet(range)
-      var moved     = SortedSet.empty[Exclusive[Long]]
+      @tailrec
+      def inner(
+          remaining: SortedSet[Exclusive[Long]],
+          moved: SortedSet[Exclusive[Long]],
+      ): SortedSet[Exclusive[Long]] =
+        if remaining.nonEmpty then
+          val current      = remaining.firstKey
+          val newRemaining = remaining - current
 
-      while remaining.nonEmpty do
-        val current = remaining.firstKey
-        remaining = remaining - current
+          val found = this.ranges.view
+            .map(r => r.chopAndMove(current))
+            .collectFirst:
+              case c: Chopped if c.adjusted.isDefined => c
 
-        val found = this.ranges.view
-          .map(r => r.chopAndMove(current))
-          .collectFirst:
-            case c: Chopped if c.adjusted.isDefined => c
+          found match
+            case None =>
+              inner(newRemaining, moved + current)
+            case Some(chopped) =>
+              chopped.adjusted match
+                case None => inner(newRemaining, moved + current)
+                case Some(a) =>
+                  inner(newRemaining ++ chopped.rest, moved + a)
+          end match
+        else moved
 
-        found match
-          case None =>
-            moved = moved + current
-          case Some(chopped) =>
-            chopped.adjusted.fold {
-              moved = moved + current
-            } { a =>
-              remaining = remaining ++ chopped.rest
-              moved = moved + a
-            }
-        end match
-      end while
-
-      moved
+      inner(SortedSet(range), SortedSet.empty[Exclusive[Long]])
     end move
   end Layer
   def calculate(layers: List[Layer], seeds: SortedSet[Exclusive[Long]]): Long =
