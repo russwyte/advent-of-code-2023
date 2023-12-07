@@ -22,7 +22,6 @@ class Day7 extends AocTest:
 end Day7
 object Day7:
   enum Card(val value: Int):
-    // Joker is special, it can be used as any other card to produce the stongest possible hand
     case Joker extends Card(1)
     case Two   extends Card(2)
     case Three extends Card(3)
