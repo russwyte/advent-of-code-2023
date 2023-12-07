@@ -1,35 +1,40 @@
 package aoc2023
 import scala.collection.immutable.SortedSet
 import javax.xml.transform.Source
+import scala.collection.immutable.NumericRange.Exclusive
 
 class Day5 extends AocTest:
   import Day5.*
-  import Range.*
-  case class Chopped(adjusted: Option[Range], rest: SortedSet[Range])
-  def chopAndMoveRange(range: Range, intersection: Range, difference: Long): Chopped =
+  def getRange(start: Long, end: Long): Option[Exclusive[Long]] =
+    Option.when(start < end)(start until end)
+  given Ordering[Exclusive[Long]] with
+    def compare(x: Exclusive[Long], y: Exclusive[Long]): Int =
+      val start = x.start.compareTo(y.start)
+      if start == 0 then x.end.compareTo(y.end) else start
+  case class Chopped(adjusted: Option[Exclusive[Long]], rest: SortedSet[Exclusive[Long]])
+  def chopAndMoveRange(range: Exclusive[Long], intersection: Exclusive[Long], difference: Long): Chopped =
     val start = math.max(range.start, intersection.start)
     val end   = math.min(intersection.end, range.end)
-    Range
-      .getExclusive(start, end)
+    getRange(start, end)
       .fold {
         Chopped(None, SortedSet(range))
       } { r =>
-        val start           = r.start + difference
-        val adjusted: Range = start until r.end + difference
+        val start                     = r.start + difference
+        val adjusted: Exclusive[Long] = start until r.end + difference
         val rest = List(
-          Range.getExclusive(intersection.start, range.start),
-          Range.getExclusive(r.end, intersection.end),
+          getRange(intersection.start, range.start),
+          getRange(r.end, intersection.end),
         )
         Chopped(Some(adjusted), SortedSet(rest.flatten*))
       }
   end chopAndMoveRange
-  case class RangeMapping(range: Range, start: Long):
-    def chopAndMove(mask: Range): Chopped =
+  case class RangeMapping(range: Exclusive[Long], start: Long):
+    def chopAndMove(mask: Exclusive[Long]): Chopped =
       chopAndMoveRange(range, mask, start - range.start)
   case class Layer(ranges: List[RangeMapping]):
-    def move(range: Range): SortedSet[Range] =
+    def move(range: Exclusive[Long]): SortedSet[Exclusive[Long]] =
       var remaining = SortedSet(range)
-      var moved     = SortedSet.empty[Range]
+      var moved     = SortedSet.empty[Exclusive[Long]]
 
       while remaining.nonEmpty do
         val current = remaining.firstKey
@@ -56,7 +61,7 @@ class Day5 extends AocTest:
       moved
     end move
   end Layer
-  def calculate(layers: List[Layer], seeds: SortedSet[Range]): Long =
+  def calculate(layers: List[Layer], seeds: SortedSet[Exclusive[Long]]): Long =
     layers
       .foldLeft(seeds): (seeds, layer) =>
         seeds.flatMap(layer.move)
@@ -117,34 +122,4 @@ object Day5:
     (seeds, layers) => ParsedInput(Seeds(seeds), layers),
     input => (input.seeds.seeds, input.layers),
   )
-  enum Range:
-    def start: Long
-    def end: Long
-    assert(start < end, s"Invalid range: $toString")
-
-    // A range where the start is included and the end is excluded
-    case Exlusive(start: Long, end: Long)
-    // A range where the start is included and the end is also included
-    case Inclusive(start: Long, end: Long)
-  end Range
-
-  object Range:
-    opaque type RangedLong = Long
-    extension (r: RangedLong)
-      def until(end: Long): Range = Exlusive(r, end)
-      def to(end: Long): Range    = Inclusive(r, end)
-
-    def getExclusive(start: Long, end: Long): Option[Range.Exlusive] =
-      Option.when(start < end)(Range.Exlusive(start, end))
-    def getInclusive(start: Long, end: Long): Option[Range.Inclusive] =
-      Option.when(start <= end)(Range.Inclusive(start, end))
-
-    val r: Range = 1L until 10L
-    given Ordering[Range] with
-      def compare(a: Range, b: Range): Int =
-        a.start.compare(b.start) match
-          case 0 => a.end.compare(b.end)
-          case n => n
-    given Conversion[Long, RangedLong] = l => l: RangedLong
-  end Range
 end Day5

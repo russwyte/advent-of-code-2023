@@ -62,7 +62,7 @@ object Day7:
     case TwoPair      extends HandType(3)
     case OnePair      extends HandType(2)
     case HighCard     extends HandType(1)
-  case class Hand(cards: List[Card], bid: Int, withJoker: Boolean = false):
+  case class Hand(cards: List[Card], bid: Int):
     val grouped =
       cards.groupBy(identity).view.mapValues(_.size).toMap
     val jokers    = grouped.getOrElse(Card.Joker, 0)
@@ -100,7 +100,7 @@ object Day7:
           val cardsOrder = x.cards.zip(y.cards).map((a, b) => a.value.compareTo(b.value))
           cardsOrder.find(_ != 0).getOrElse(0)
     def apply(s: String, bid: Int, withJoker: Boolean): Hand =
-      Hand(s.toList.map(Card.apply(_, withJoker)), bid, withJoker)
+      Hand(s.toList.map(Card.apply(_, withJoker)), bid)
     def apply(s: String, withJoker: Boolean): Hand = Hand(s.take(5), s.drop(6).toInt, withJoker)
   end Hand
 
