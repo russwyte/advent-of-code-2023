@@ -56,8 +56,8 @@ class Day8 extends AocTest:
         Node("XXX", "XXX", "XXX"),
       ),
     )
-    assertEquals(n.countToSynchronizeAllStartsToEnds, BigInt(6))
-    assertEquals(network.countToSynchronizeAllStartsToEnds, BigInt(16563603485021L))
+    assertEquals(n.countStepsSynchronizeAllStarts, BigInt(6))
+    assertEquals(network.countStepsSynchronizeAllStarts, BigInt(16563603485021L))
 end Day8
 
 object Day8:
@@ -74,8 +74,6 @@ object Day8:
       case 'R' => Right
 
   case class Node(name: String, left: String, right: String):
-    def isStart = name endsWith "A"
-    def isEnd   = name endsWith "Z"
     def apply(step: Step): String = step match
       case Step.Left  => left
       case Step.Right => right
@@ -83,17 +81,17 @@ object Day8:
   case class Network(steps: List[Step], nodes: List[Node]):
     val nodeMap = nodes.map(n => n.name -> n).toMap
 
-    def countToSynchronizeAllStartsToEnds: BigInt =
-      nodes.filter(_.isStart).map(node => countStepsToEnd(node.name, nodeMap(_).isEnd)).reduce(_ lcm _)
+    def countStepsSynchronizeAllStarts: BigInt =
+      nodes.filter(_.name.endsWith("A")).map(node => countStepsToEnd(node.name, _ endsWith "Z")).reduce(_ lcm _)
 
     def countStepsToEnd(startName: String, isEnd: String => Boolean): BigInt =
       @tailrec
-      def inner(steps: List[Step], node: Node, count: Int): Int =
+      def inner(remainingSteps: List[Step], node: Node, count: Int): Int =
         if isEnd(node.name) then count
         else
-          steps match
-            case Nil     => inner(this.steps, node, count)
-            case s :: ss => inner(ss, nodeMap(node(s)), count + 1)
+          remainingSteps match
+            case Nil          => inner(steps, node, count)
+            case step :: rest => inner(rest, nodeMap(node(step)), count + 1)
       inner(steps, nodeMap(startName), 0)
     end countStepsToEnd
   end Network
