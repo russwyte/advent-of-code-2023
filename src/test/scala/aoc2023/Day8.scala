@@ -43,20 +43,7 @@ class Day8 extends AocTest:
     assertEquals(network.countStepsToEnd("AAA", _ == "ZZZ"), BigInt(16897))
 
   test("part2"):
-    val n = Network(
-      List(Step.Left, Step.Right),
-      List(
-        Node("11A", "11B", "XXX"),
-        Node("11B", "XXX", "11Z"),
-        Node("11Z", "11B", "XXX"),
-        Node("22A", "22B", "XXX"),
-        Node("22B", "22C", "22C"),
-        Node("22C", "22Z", "22Z"),
-        Node("22Z", "22B", "22B"),
-        Node("XXX", "XXX", "XXX"),
-      ),
-    )
-    assertEquals(n.countStepsSynchronizeAllStarts, BigInt(6))
+    assertEquals(example3Network.countStepsSynchronizeAllStarts, BigInt(6))
     assertEquals(network.countStepsSynchronizeAllStarts, BigInt(16563603485021L))
 end Day8
 
