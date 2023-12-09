@@ -85,7 +85,7 @@ object Day8:
 
   extension (a: BigInt) def lcm(b: BigInt): BigInt = a * b / a.gcd(b)
 
-  val nameSyntax = Syntax.charIn("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ").repeat.toList.transform(_.mkString, _.toList)
+  val nameSyntax = Syntax.alphaNumeric.repeat.toList.transform(_.mkString, _.toList)
   val nodeSyntax =
     (nameSyntax ~ Syntax.string(" = (", ()) ~ nameSyntax ~ Syntax.string(", ", ()) ~ nameSyntax ~ Syntax
       .char(')'))
