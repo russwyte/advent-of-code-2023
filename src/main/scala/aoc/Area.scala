@@ -73,6 +73,12 @@ object Area:
       yRange = ys.min to ys.max,
     )
 
+  def bounding(a: Point, b: Point): Area =
+    Area(
+      xRange = (a.x min b.x) to (a.x max b.x),
+      yRange = (a.y min b.y) to (a.y max b.y),
+    )
+
   def apply(left: Int, right: Int, top: Int, bottom: Int): Area =
     Area(left to right, top to bottom)
 end Area
