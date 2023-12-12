@@ -4,7 +4,7 @@ import Direction.*
 
 class Day10 extends AocTest:
   import Day10.*
-  val pipeField = PipeField(input.toVector)
+  val pipeField = PipeField(input)
   test("part1"):
     assertEquals(pipeField.loopSteps.length - 1, 6640)
 
@@ -95,11 +95,10 @@ object Day10:
     end adjacent
 
     val loopSteps: List[Set[Point]] =
-      val steps = Iterator.unfold(Set.empty[Point] -> Set(start)):
-        case (visited, current) =>
-          Option.when(current.nonEmpty):
-            val next = current.flatMap(adjacent).diff(visited)
-            (current, current -> next)
+      val steps = Iterator.unfold(Set.empty[Point] -> Set(start)): (visited, current) =>
+        Option.when(current.nonEmpty):
+          val next = current.flatMap(adjacent).diff(visited)
+          (current, current -> next)
       steps.toList
 
     val boundary = loopSteps.reduce(_ union _)
@@ -169,11 +168,11 @@ object Day10:
       val block = '\u2588'
 
       area.draw: p =>
-        if p == start then block
-        else if inside(p) then dark
+        if inside(p) then dark
         else if outside(p) then light
+        else if p == start then 'S'
         else if boundary.contains(p) then grid(p).toChar
-        else 'X'
+        else '?'
     end toString
   end PipeField
 end Day10

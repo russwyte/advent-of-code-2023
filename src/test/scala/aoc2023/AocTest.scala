@@ -6,7 +6,7 @@ import zio.Chunk
 
 abstract class AocTest extends munit.FunSuite:
   self =>
-  val input: Seq[String] = Source.fromResource(self.getClass.getSimpleName + ".txt").getLines().toSeq
+  val input: Vector[String] = Source.fromResource(self.getClass.getSimpleName + ".txt").getLines().toVector
 object AocTest:
   val intSyntax: Syntax[String, Char, Char, Int] = Syntax.digit.repeat.transform(
     { case chars: Chunk[Char] => chars.mkString.toInt },

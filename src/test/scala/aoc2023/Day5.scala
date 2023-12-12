@@ -73,7 +73,7 @@ class Day5 extends AocTest:
     .fromResource("Day5.txt")
     .mkString
     .split("\r?\n\\s*\r?\n")
-    .toList
+    .toVector
 
   val parsedInput = parsedInputSyntax.parseString(input.mkString("\n")).toOption.get
   val seeds1 = SortedSet.from(parsedInput.seeds.seeds.map: point =>
