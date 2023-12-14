@@ -5,7 +5,7 @@ import aoc.*
 
 class Day11 extends AocTest:
   val starMap: Area             = Area(input)
-  val galaxies: Vector[Point]   = starMap.pointsIterator.filter(input(_) == '#').toVector
+  val galaxies: Vector[Point]   = starMap.points.filter(input(_) == '#').toVector
   val occupiedRows: Set[Int]    = galaxies.map(_.y).toSet
   val occupiedColumns: Set[Int] = galaxies.map(_.x).toSet
   def measure(a: Point, b: Point, growth: Long): Long =

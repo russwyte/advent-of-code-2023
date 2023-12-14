@@ -1,5 +1,7 @@
 package aoc
 
+import Direction.*
+
 case class Area(xRange: Range, yRange: Range):
   def left   = xRange.min
   def right  = xRange.max
@@ -20,6 +22,14 @@ case class Area(xRange: Range, yRange: Range):
   def leftBorder   = Line(topLeft, bottomLeft)
   def rightBorder  = Line(topRight, bottomRight)
 
+  def splitHorizontal(n: Int): (Area, Area) =
+    val mid = left + n
+    (Area(left to mid, yRange), Area(mid + 1 to right, yRange))
+
+  def splitVertical(n: Int): (Area, Area) =
+    val mid = top + n
+    (Area(xRange, top to mid), Area(xRange, mid + 1 to bottom))
+
   def contains(p: Point) =
     xRange.contains(p.x) && yRange.contains(p.y)
 
@@ -34,16 +44,41 @@ case class Area(xRange: Range, yRange: Range):
   def expand(n: Int): Area =
     copy(left - n to right + n, top - n to bottom + n)
 
-  def pointsIterator = for
-    y <- yRange.iterator
-    x <- xRange
-  yield Point(x, y)
+  def points = pointsIterator()
+  def pointsIterator(from: Direction = North) =
+    from match
+      case Up | North =>
+        for
+          y <- yRange.iterator
+          x <- xRange
+        yield Point(x, y)
+      case Down | South =>
+        for
+          y <- yRange.reverseIterator
+          x <- xRange.reverseIterator
+        yield Point(x, y)
+      case East | Right =>
+        for
+          x <- xRange.reverseIterator
+          y <- yRange
+        yield Point(x, y)
+      case West | Left =>
+        for
+          x <- xRange.iterator
+          y <- yRange.reverseIterator
+        yield Point(x, y)
+
+  def intersect(that: Area): Option[Area] =
+    for
+      xInterval <- Interval(xRange).intersect(Interval(that.xRange))
+      yInterval <- Interval(yRange).intersect(Interval(that.yRange))
+    yield Area(xInterval.toRange, yInterval.toRange)
 
   def draw(f: Point => Char): String =
     val sb = collection.mutable.StringBuilder()
     for y <- yRange do
       for x <- xRange do sb.addOne(f(Point(x, y)))
-      sb.addOne('\n')
+      if y < yRange.end - 1 then sb.addOne('\n')
     sb.result()
 end Area
 

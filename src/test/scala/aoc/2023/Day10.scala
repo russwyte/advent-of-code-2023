@@ -18,7 +18,7 @@ object Day10:
   case class PipeField(in: Vector[String]):
     val area = Area(in)
 
-    val start = area.pointsIterator.find(in(_) == 'S').get
+    val start = area.points.find(in(_) == 'S').get
 
     enum Tile:
       case TopBottom, TopLeft, TopRight, BottomLeft, BottomRight, LeftRight, Empty, Start
