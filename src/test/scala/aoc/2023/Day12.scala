@@ -20,7 +20,6 @@ class Day12 extends AocTest:
   val r  = Record("#.#.### 1,1,3")
   val r2 = Record("???.### 1,1,3")
 
-  println(example1.map(_.possibleArrangements))
   test("part1"):
     assertEquals(example1.map(_.possibleArrangements).sum, 21L)
     assertEquals(records.map(_.possibleArrangements).sum, 7307L)
