@@ -41,6 +41,14 @@ case class Area(xRange: Range, yRange: Range):
       p.move(Direction.Right),
     ).filter(contains)
 
+  def adjacentMap(p: Point): Map[Direction, Point] =
+    Map(
+      Direction.Up    -> p.move(Direction.Up),
+      Direction.Down  -> p.move(Direction.Down),
+      Direction.Left  -> p.move(Direction.Left),
+      Direction.Right -> p.move(Direction.Right),
+    ).filter { case (_, p) => contains(p) }
+
   def expand(n: Int): Area =
     copy(left - n to right + n, top - n to bottom + n)
 
@@ -67,6 +75,7 @@ case class Area(xRange: Range, yRange: Range):
           x <- xRange.iterator
           y <- yRange.reverseIterator
         yield Point(x, y)
+      case Stop => Iterator.empty
 
   def intersect(that: Area): Option[Area] =
     for

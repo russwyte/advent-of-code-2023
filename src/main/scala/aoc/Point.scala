@@ -7,6 +7,7 @@ case class Point(x: Int, y: Int):
     case Down | South => copy(y = y + distance)
     case Left | West  => copy(x = x - distance)
     case Right | East => copy(x = x + distance)
+    case Stop         => this
 
   def asTuple: (Int, Int) = (x, y)
 
