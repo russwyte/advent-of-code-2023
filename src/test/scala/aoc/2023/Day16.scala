@@ -17,19 +17,23 @@ class Day16 extends AocTest:
                 case Up | Down | North | South => List(Energy(direction, nextPoint))
                 case Left | West | Right | East =>
                   List(Energy(direction.left, nextPoint), Energy(direction.right, nextPoint))
+                case _ => ???
             case '-' =>
               direction match
                 case Left | West | Right | East => List(Energy(direction, nextPoint))
                 case Up | Down | North | South =>
                   List(Energy(direction.left, nextPoint), Energy(direction.right, nextPoint))
+                case _ => ???
             case '/' =>
               direction match
                 case Up | North | Down | South  => List(Energy(direction.right, nextPoint))
                 case Left | West | Right | East => List(Energy(direction.left, nextPoint))
+                case _                          => ???
             case '\\' =>
               direction match
                 case Up | North | Down | South  => List(Energy(direction.left, nextPoint))
                 case Left | West | Right | East => List(Energy(direction.right, nextPoint))
+                case _                          => ???
             case '.' => List(Energy(direction, nextPoint))
             case _   => ???
         end if

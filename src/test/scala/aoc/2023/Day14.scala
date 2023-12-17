@@ -34,6 +34,7 @@ class Day14 extends AocTest:
           case Down | South => p.y
           case Left | West  => p.x
           case Right | East => area.width - p.x
+          case Stop         => 0
       }
       .sum
     override def toString(): String = area.draw(p => grid(p))
