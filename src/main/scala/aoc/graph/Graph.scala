@@ -19,8 +19,7 @@ trait Order[A]:
   def nodeOrder: collection.Seq[A]
 
 trait GraphSearch[A] extends GraphTraversal[A]:
-  // def isTargetNode(node: A): Boolean
-  def isTargetNode(node: A, dist: Int): Boolean // TODO: does dist-based target make sense for A*?
+  def isTargetNode(node: A, dist: Int): Boolean
 
 trait TargetNode[A]:
   this: GraphSearch[A] =>
