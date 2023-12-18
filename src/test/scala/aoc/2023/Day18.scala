@@ -13,9 +13,11 @@ class Day18 extends AocTest:
     val points = steps.scanLeft(Point(0, 0))({ case (p, step) =>
       p.move(step.direction, step.length)
     })
-    val area     = Geometry.polygonArea[Long](points)
+    val area     = Geometry.polygonArea[Long](points) // shoelace
     val boundary = steps.map(_.length.toLong).sum
-    val inside   = area - boundary / 2 + 1 // Using Pick's theorem
+    val inside =
+      area - (boundary / 2) + 1 // Using Pick's theorem (area = interior + boundary / 2 - 1) solve for interior (interior = area - boundary / 2 + 1)
+    println(s"a=$area, b=$boundary, i=$inside res=${inside + boundary}")
     boundary + inside
   end size
 

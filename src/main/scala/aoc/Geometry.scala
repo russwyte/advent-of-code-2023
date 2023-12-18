@@ -8,17 +8,12 @@ object Geometry:
   extension [A](it: Iterator[A])
     def zipWithTail: Iterator[(A, A)] =
       if it.hasNext then
-        // TODO: can be done with unfold for Iterator?
-        new AbstractIterator[(A, A)]:
-          private var prev: A = it.next()
-
-          override def hasNext: Boolean = it.hasNext
-
-          override def next(): (A, A) =
-            val cur = it.next()
-            val ret = (prev, cur)
-            prev = cur
-            ret
+        val seed = (it.next(), it)
+        Iterator.unfold(seed): (prev, iterator) =>
+          iterator
+            .nextOption()
+            .map: cur =>
+              ((prev, cur), (cur, iterator))
       else Iterator.empty
   end extension
 
@@ -26,8 +21,8 @@ object Geometry:
     * @see
     *   [[https://en.wikipedia.org/wiki/Shoelace_formula]]
     */
-  def polygonArea[A](poss: collection.Seq[Point])(using aIntegral: Integral[A]): A =
-    ((poss.last +: poss).iterator.zipWithTail
+  def polygonArea[A](points: collection.Seq[Point])(using aIntegral: Integral[A]): A =
+    ((points.last +: points).iterator.zipWithTail
       .map(_ cross _)
       .sum / aIntegral.fromInt(2)).abs
 
