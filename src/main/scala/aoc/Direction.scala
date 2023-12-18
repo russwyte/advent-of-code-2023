@@ -45,4 +45,11 @@ object Direction:
   val D = Down
   val L = Left
   val R = Right
+
+  def fromChar(c: Char) = c match
+    case 'U' => Up
+    case 'D' => Down
+    case 'L' => Left
+    case 'R' => Right
+    case _   => Stop
 end Direction

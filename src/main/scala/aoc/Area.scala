@@ -87,7 +87,7 @@ case class Area(xRange: Range, yRange: Range):
     val sb = collection.mutable.StringBuilder()
     for y <- yRange do
       for x <- xRange do sb.addOne(f(Point(x, y)))
-      if y < yRange.end - 1 then sb.addOne('\n')
+      if y < yRange.end then sb.addOne('\n')
     sb.result()
 end Area
 

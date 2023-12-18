@@ -17,4 +17,21 @@ object AocTest:
     { case i: Long => Chunk.fromIterable(i.toString) },
   )
   val whiteSpaceSep = Syntax.whitespace.+.transform(_ => (), _ => Chunk.empty)
+  val dirSyntax = Syntax
+    .charIn("UDLR")
+    .transform(
+      {
+        case 'U' => Direction.Up
+        case 'D' => Direction.Down
+        case 'L' => Direction.Left
+        case 'R' => Direction.Right
+      },
+      {
+        case Direction.Up    => 'U'
+        case Direction.Down  => 'D'
+        case Direction.Left  => 'L'
+        case Direction.Right => 'R'
+        case _               => ??? // impossible
+      },
+    )
 end AocTest

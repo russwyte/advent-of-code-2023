@@ -16,6 +16,10 @@ case class Point(x: Int, y: Int):
   def rotateLeft: Point                   = Point(-y, x)
   def rotateRight: Point                  = Point(y, -x)
   def manhattanDistance(that: Point): Int = (this.x - that.x).abs + (this.y - that.y).abs
+  def cross[A](that: Point)(using aNumeric: Numeric[A]): A =
+    import scala.math.Numeric.Implicits.infixNumericOps
+    aNumeric.fromInt(x) * aNumeric.fromInt(that.y) - aNumeric.fromInt(that.x) * aNumeric.fromInt(y)
+
 end Point
 object Point:
   extension [T](grid: IndexedSeq[IndexedSeq[T]]) def apply(p: Point): T = grid(p.y)(p.x)
