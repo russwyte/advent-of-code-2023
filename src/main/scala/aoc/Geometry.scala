@@ -6,15 +6,14 @@ import scala.collection.{AbstractIterator, immutable}
 
 object Geometry:
   extension [A](it: Iterator[A])
-    def zipWithTail: Iterator[(A, A)] =
-      if it.hasNext then
-        val seed = (it.next(), it)
-        Iterator.unfold(seed): (prev, iterator) =>
+    def zipWithTail: Iterator[(A, A)] = it
+      .nextOption()
+      .fold(Iterator.empty): first =>
+        Iterator.unfold((first, it)): (prev, iterator) =>
           iterator
             .nextOption()
             .map: cur =>
               ((prev, cur), (cur, iterator))
-      else Iterator.empty
   end extension
 
   /** Calculates the area of a simple polygon using the shoelace formula.
