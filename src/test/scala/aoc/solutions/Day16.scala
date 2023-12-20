@@ -1,4 +1,4 @@
-package aoc.`2023`
+package aoc.solutions
 import aoc.*
 import aoc.Direction.*
 import scala.annotation.tailrec

@@ -1,6 +1,6 @@
 package aoc
 
-case class Point(x: Int, y: Int):
+case class Point(x: Int, y: Int) extends PointLike[Point]:
   import Direction.*
   def move(d: Direction, distance: Int = 1): Point = d match
     case Up | North   => copy(y = y - distance)
@@ -9,13 +9,18 @@ case class Point(x: Int, y: Int):
     case Right | East => copy(x = x + distance)
     case Stop         => this
 
-  def asTuple: (Int, Int) = (x, y)
+  def asTuple: (Int, Int)     = (x, y)
+  def min(that: Point): Point = Point(x min that.x, y min that.y)
+  def max(that: Point): Point = Point(x max that.x, y max that.y)
 
-  def +(that: Point): Point               = Point(this.x + that.x, this.y + that.y)
-  def -(that: Point): Point               = Point(this.x - that.x, this.y - that.y)
-  def rotateLeft: Point                   = Point(-y, x)
-  def rotateRight: Point                  = Point(y, -x)
-  def manhattanDistance(that: Point): Int = (this.x - that.x).abs + (this.y - that.y).abs
+  def +(that: Point): Point                  = Point(x + that.x, y + that.y)
+  def -(that: Point): Point                  = Point(x - that.x, y - that.y)
+  def *(n: Int): Point                       = Point(x * n, y * n)
+  def <=(that: Point): Boolean               = x <= that.x && y <= that.y
+  def offset(that: Point, count: Int): Point = this + (that * count)
+  def rotateLeft: Point                      = Point(-y, x)
+  def rotateRight: Point                     = Point(y, -x)
+  def manhattanDistance(that: Point): Int    = (x - that.x).abs + (y - that.y).abs
   def cross[A](that: Point)(using aNumeric: Numeric[A]): A =
     import scala.math.Numeric.Implicits.infixNumericOps
     aNumeric.fromInt(x) * aNumeric.fromInt(that.y) - aNumeric.fromInt(that.x) * aNumeric.fromInt(y)
