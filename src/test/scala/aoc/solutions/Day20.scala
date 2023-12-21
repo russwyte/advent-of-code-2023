@@ -5,6 +5,7 @@ import aoc.AocTest
 import scala.collection.mutable
 import scala.collection.immutable.Queue
 import scala.annotation.tailrec
+import aoc.*
 
 class Day20 extends AocTest:
   import Module.*
