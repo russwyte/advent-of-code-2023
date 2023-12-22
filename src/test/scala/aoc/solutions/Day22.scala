@@ -5,8 +5,6 @@ import scala.concurrent.duration.*
 
 class Day22 extends AocTest:
   override val munitTimeout = Duration(120, "s")
-  // A brick is a rectangular cuboid, specified by two opposite corners.
-  // the Z coordinate is the height of the brick with respect to the floor so it is always positive with 1 being the lowest possible value
   case class Brick(name: String, a: Area3):
     def fall: Brick =
       copy(a = a.copy(min = a.min.copy(z = a.min.z - 1), max = a.max.copy(z = a.max.z - 1)))
@@ -19,9 +17,6 @@ class Day22 extends AocTest:
   // A pile is a collection of bricks.
   case class Pile(bricks: Brick*):
     val MinZ = 1
-    // let's write a to settle the pile such that bricks are stacked on top of each other
-    // and the pile is as short as possible - bricks will not change their orientation
-    // to accomplish this we should move each brick starting from the bottom until it hits another brick or rests on the floor
     def settle: Pile =
       @tailrec
       def settleBrick(brick: Brick, settled: Vector[Brick]): Brick =
@@ -43,8 +38,6 @@ class Day22 extends AocTest:
       if res.isStable then res
       else res.settle
     end settle
-    // let write a function to check if a pile is stable
-    // a pile is stable if all bricks all resting on the floor or on other bricks
     def isStable: Boolean =
       bricks.forall { brick =>
         brick.a.min.z == MinZ || {
@@ -53,15 +46,12 @@ class Day22 extends AocTest:
         }
       }
 
-    // let's write a function to check if a brick is safe
-    // a brick is safe if it can be removed and the pile will remain stable
     def isBrickSafe(brick: Brick): Boolean =
       val newPile = Pile(bricks.filterNot(_ == brick)*)
       newPile.isStable
 
     def safeBricks = bricks.filter(isBrickSafe)
 
-    // let's write a function to count the number of bricks that would fall if we remove a brick
     def countFallingBricks(brick: Brick): Int =
       val set     = bricks.toSet - brick
       val newPile = Pile(bricks.filterNot(_ == brick)*).settle
