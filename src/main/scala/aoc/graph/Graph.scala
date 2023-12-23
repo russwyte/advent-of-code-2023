@@ -33,3 +33,7 @@ trait Heuristic[A]:
 
 trait Target[A]:
   def target: Option[(A, Int)]
+
+trait GraphComponents[A]:
+  def nodes: IterableOnce[A]
+  def unitNeighbors(node: A): IterableOnce[A]

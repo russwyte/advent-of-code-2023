@@ -2,6 +2,14 @@ package aoc
 
 case class Point(x: Int, y: Int) extends PointLike[Point]:
   import Direction.*
+  def adjacent: Set[Point] = Set(Up, Down, Left, Right).map(move(_))
+  def adjacentMap: Map[Direction, Point] =
+    Map(
+      Direction.North -> move(Direction.North),
+      Direction.South -> move(Direction.South),
+      Direction.East  -> move(Direction.East),
+      Direction.West  -> move(Direction.West),
+    )
   def move(d: Direction, distance: Int = 1): Point = d match
     case Up | North   => copy(y = y - distance)
     case Down | South => copy(y = y + distance)

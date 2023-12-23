@@ -23,14 +23,8 @@ class Day22 extends AocTest:
         if brick.a.min.z == MinZ then brick
         else
           val newBrick = brick.fall
-          settled.forall { s =>
-            val res = s.a.intersect(newBrick.a).isEmpty
-            res
-          } match
-            case true =>
-              settleBrick(newBrick, settled)
-            case false =>
-              brick
+          if settled.forall { _.a.intersect(newBrick.a).isEmpty } then settleBrick(newBrick, settled)
+          else brick
       val settledBricks = bricks.foldLeft(Vector.empty[Brick]) { (acc, brick) =>
         acc.appended(settleBrick(brick, acc))
       }

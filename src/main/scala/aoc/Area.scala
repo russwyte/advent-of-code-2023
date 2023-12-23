@@ -33,13 +33,7 @@ case class Area(xRange: Range, yRange: Range):
   def contains(p: Point) =
     xRange.contains(p.x) && yRange.contains(p.y)
 
-  def adjacent(p: Point): Set[Point] =
-    Set(
-      p.move(Direction.Up),
-      p.move(Direction.Down),
-      p.move(Direction.Left),
-      p.move(Direction.Right),
-    ).filter(contains)
+  def adjacent(p: Point): Set[Point] = p.adjacent.filter(contains)
 
   def adjacentMap(p: Point): Map[Direction, Point] =
     Map(
