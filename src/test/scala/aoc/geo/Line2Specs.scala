@@ -56,8 +56,6 @@ class Line2Specs extends munit.FunSuite:
     val l1 = Line2(Point2(1, 2), Point2(3, 4))
     val l2 = Line2(Point2(3, 4), Point2(1, 2))
     val l3 = Line2(Point2(1, 2), Point2(1, 4))
-    println(l1.xRange)
-    println(l2.xRange)
     assertEquals(l1.xRange, Inclusive(1, 3, 1))
     assertEquals(l2.xRange, Inclusive(3, 1, -1))
     assertEquals(l3.xRange, Inclusive(1, 1, 1))
@@ -87,7 +85,6 @@ class Line2Specs extends munit.FunSuite:
     val l2 = Line2(Point2(2, 2), Point2(5, 6))
     assertEquals(l1.intersect(l2), Some(Point2(1, 1)))
     assertEquals(l2.intersect(l1), Some(Point2(1, 1)))
-    println(l1.intersect(l2))
   test("Line2[Int] intersect with negative fractional result"):
     val l1 = Line2(Point2(1, 1), Point2(-4, -4))
     val l2 = Line2(Point2(0, -1), Point2(-2, 0))

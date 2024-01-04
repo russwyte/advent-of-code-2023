@@ -22,22 +22,22 @@ case class Line2[A](start: Point2[A], end: Point2[A])(using intergral: Integral[
     if (isHorizontal || isVertical) && yRange.contains(y) then xRange
     else if yRange.contains(y) then
       val x1: A = doubleToA(((y.toDouble - 0.5) - yIntercept) / slope)
-      val x2: A = if is45Degree then doubleToA(((y.toDouble + 0.5) - yIntercept) / slope) else x1
+      val x2: A = if !is45Degree then doubleToA(((y.toDouble + 0.5) - yIntercept) / slope) else x1
       val calcRange: Inclusive[A] =
         Line2(Point2(x1, y), Point2(x2, y)).xRange
       val as = calcRange.intersect(xRange)
-      Inclusive(as.head, as.last, calcRange.step)
+      as.headOption.map(h => Inclusive(h, as.last, calcRange.step)).getOrElse(emptyRange)
     else emptyRange
 
   def yRangeAt(x: A): NumericRange[A] =
     if (isHorizontal || isVertical) && xRange.contains(x) then yRange
     else if xRange.contains(x) then
       val y1: A = doubleToA(((x.toDouble - 0.5) * slope) + yIntercept)
-      val y2: A = if is45Degree then doubleToA(((x.toDouble + 0.5) * slope) + yIntercept) else y1
+      val y2: A = if !is45Degree then doubleToA(((x.toDouble + 0.5) * slope) + yIntercept) else y1
       val calcRange: Inclusive[A] =
         Line2(Point2(x, y1), Point2(x, y2)).yRange
       val as = calcRange.intersect(yRange)
-      Inclusive(as.head, as.last, calcRange.step)
+      as.headOption.map(h => Inclusive(h, as.last, calcRange.step)).getOrElse(emptyRange)
     else emptyRange
 
   def yIntercept: Double = start.y.toDouble - slope * start.x.toDouble
@@ -56,7 +56,8 @@ case class Line2[A](start: Point2[A], end: Point2[A])(using intergral: Integral[
     if dy.sign == intergral.zero then intergral.one else dy.sign,
   )
 
-  def pointsIntersecting = xRange.iterator.flatMap(x => yRangeAt(x).map(y => Point2(x, y)))
+  def pointsIntersecting =
+    xRange.iterator.flatMap(x => yRangeAt(x).map(y => Point2(x, y)))
 
   def intersect(that: Line2[A]): Option[Point2[A]] =
     if isVertical && that.isVertical then None
