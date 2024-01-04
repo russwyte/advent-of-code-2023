@@ -1,7 +1,7 @@
 package aoc
 
 import scala.io.Source
-import zio.parser.Syntax
+import zio.parser.*
 import zio.Chunk
 
 abstract class AocTest extends munit.FunSuite:
@@ -11,14 +11,19 @@ abstract class AocTest extends munit.FunSuite:
   def input: Vector[String]           = inputIterator.toVector
 
 object AocTest:
-  val intSyntax: Syntax[String, Char, Char, Int] = Syntax.digit.repeat.transform(
-    { case chars: Chunk[Char] => chars.mkString.toInt },
-    { case i: Int => Chunk.fromIterable(i.toString) },
-  )
-  val longSyntax: Syntax[String, Char, Char, Long] = Syntax.digit.repeat.transform(
-    { case chars: Chunk[Char] => chars.mkString.toLong },
-    { case i: Long => Chunk.fromIterable(i.toString) },
-  )
+  val numStrSyntax: Syntax[String, Char, Char, String] =
+    (Syntax.charIn("-").? ~ Syntax.digit.repeat.toList.transform(_.mkString, _.toList)).transform(
+      { case (sign, digits) =>
+        sign.getOrElse("").toString() + digits
+      },
+      { case s: String =>
+        if s.startsWith("-") then (Some('-'), s.substring(1))
+        else (None, s)
+      },
+    )
+  val intSyntax  = numStrSyntax.transform(_.toInt, _.toString)
+  val longSyntax = numStrSyntax.transform(_.toLong, _.toString)
+
   val whiteSpaceSep = Syntax.whitespace.+.transform(_ => (), _ => Chunk.empty)
   val dirSyntax = Syntax
     .charIn("UDLR")
