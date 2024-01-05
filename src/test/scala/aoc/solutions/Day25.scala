@@ -4,13 +4,12 @@ import zio.parser.*
 import aoc.graph.*
 import scala.collection.immutable.Queue
 import scala.collection.mutable
-import scala.util.boundary
-import scala.util.boundary.break
 
 class Day25 extends AocTest:
-  // a machine a graph of nodes and edges where every node is connected to every other node
   case class Machine(edges: Set[Edge[String]]):
     val nodes = edges.flatMap(e => Set(e.a, e.b))
+
+    def size: Int = nodes.size
 
     def machineProduct: Option[Int] =
       (nodes - nodes.head).view
@@ -21,15 +20,17 @@ class Day25 extends AocTest:
             override val startNode: String = nodes.head
 
             override def unitNeighbors(node: String): IterableOnce[String] =
-              for
-                (toNode, r) <- r.residual(node)
-                if r > 0
-              yield toNode
+              r.residual(node).filter { case (_, r) => r > 0 }.map { case (n, _) => n }
 
-          val component = BFS.traverse(graphTraversal).nodes
-          val a         = component.size
-          val b         = nodes.size - a
-          a * b
+          val d1 = BFS.traverse(graphTraversal).nodes
+          val d2 = nodes -- d1
+          val m1 = Machine(
+            edges.filter(e => d2.contains(e.a) && d2.contains(e.b))
+          )
+          val m2 = Machine(
+            edges.filter(e => d1.contains(e.a) && d1.contains(e.b))
+          )
+          m1.size * m2.size
 
     end machineProduct
 
