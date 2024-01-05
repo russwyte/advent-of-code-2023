@@ -12,28 +12,25 @@ class Day25 extends AocTest:
   case class Machine(edges: Set[Edge[String]]):
     val nodes = edges.flatMap(e => Set(e.a, e.b))
 
-    def machineProduct: Int =
-      val start = nodes.head
+    def machineProduct: Option[Int] =
+      (nodes - nodes.head).view
+        .map(EdmondsKarp(edges, nodes.head, _))
+        .find(_.maxFlow == 3)
+        .map: r =>
+          val graphTraversal = new GraphTraversal[String] with UnitNeighbors[String]:
+            override val startNode: String = nodes.head
 
-      val (maxFlow, residual) =
-        (nodes - start).view
-          .map(edmondsKarp(edges, start, _))
-          .find(_._1 == 3)
-          .get
+            override def unitNeighbors(node: String): IterableOnce[String] =
+              for
+                (toNode, r) <- r.residual(node)
+                if r > 0
+              yield toNode
 
-      val graphTraversal = new GraphTraversal[String] with UnitNeighbors[String]:
-        override val startNode: String = start
+          val component = BFS.traverse(graphTraversal).nodes
+          val a         = component.size
+          val b         = nodes.size - a
+          a * b
 
-        override def unitNeighbors(node: String): IterableOnce[String] =
-          for
-            (toNode, r) <- residual(node)
-            if r > 0
-          yield toNode
-
-      val component = BFS.traverse(graphTraversal).nodes
-      val a         = component.size
-      val b         = nodes.size - a
-      a * b
     end machineProduct
 
   end Machine
@@ -73,6 +70,6 @@ class Day25 extends AocTest:
   val machine = Machine(inputString)
 
   test("part 1"):
-    assertEquals(example.machineProduct, 54)
-    assertEquals(machine.machineProduct, 619225)
+    assertEquals(example.machineProduct, Some(54))
+    assertEquals(machine.machineProduct, Some(619225))
 end Day25

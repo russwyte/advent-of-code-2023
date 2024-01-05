@@ -1,7 +1,6 @@
 package aoc.graph
-import scala.collection.mutable
-import scala.util.boundary
-import scala.util.boundary.break
+//import scala.collection.mutable
+import scala.annotation.tailrec
 
 trait GraphTraversal[A]:
   val startNode: A
@@ -51,24 +50,24 @@ trait Paths[A]:
     prevNodes.map((node, _) => node -> (node +: LazyList.unfold0(node)(prevNodes.get)).reverse)
 
 case class Edge[A](a: A, b: A)
-def edmondsKarp[A](
-    edges: Set[Edge[A]],
-    startNode0: A,
-    targetNode0: A,
-): (Int, collection.Map[A, collection.Map[A, Int]]) =
 
-  val residual: mutable.Map[A, mutable.Map[A, Int]] = mutable.Map.empty
+object EdmondsKarp:
+  case class MaxFLowResult[A](maxFlow: Int, residual: Map[A, Map[A, Int]])
+  // basically we treat this algorithm as a function - thus the apply method
+  def apply[A](
+      edges: Set[Edge[A]],
+      startNode0: A,
+      targetNode0: A,
+  ): MaxFLowResult[A] =
+    val initResidual = edges.foldLeft(Map.empty[A, Map[A, Int]]) { (acc, edge) =>
+      val Edge(u, v) = edge
+      acc
+        .updated(u, acc.getOrElse(u, Map.empty).updated(v, 1))
+        .updated(v, acc.getOrElse(v, Map.empty).updated(u, 1))
+    }
 
-  for Edge(u, v) <- edges do
-    if !residual.contains(u) then residual(u) = mutable.Map.empty
-    if !residual.contains(v) then residual(v) = mutable.Map.empty
-    residual(u)(v) = 1
-    residual(v)(u) = 1
-
-  var maxFlow = 0
-
-  boundary {
-    while true do
+    @tailrec
+    def loop(maxFlow: Int, residual: Map[A, Map[A, Int]]): MaxFLowResult[A] =
       val graphSearch = new GraphSearch[A] with UnitNeighbors[A] with TargetNode[A]:
         override val startNode: A = startNode0
 
@@ -81,17 +80,20 @@ def edmondsKarp[A](
         override val targetNode: A = targetNode0
 
       val searchResult = BFS.searchPaths(graphSearch)
-      if searchResult.target.isEmpty then break()
+      if searchResult.target.isEmpty then MaxFLowResult(maxFlow, residual)
       else
         val targetPath = searchResult.paths(targetNode0)
         val pathEdges  = targetPath lazyZip targetPath.tail
         val pathFlow   = pathEdges.map(residual(_)(_)).min
-        for (u, v) <- pathEdges do
-          residual(u)(v) -= pathFlow
-          residual(v)(u) += pathFlow
-        maxFlow += pathFlow
+        val newRes = pathEdges.foldLeft(residual) { (acc, edge) =>
+          val (u, v) = edge
+          acc
+            .updated(u, acc(u).updated(v, acc(u)(v) - pathFlow))
+            .updated(v, acc(v).updated(u, acc(v)(u) + pathFlow))
+        }
+        loop(maxFlow + pathFlow, newRes)
       end if
-  }
-
-  (maxFlow, residual)
-end edmondsKarp
+    end loop
+    loop(0, initResidual)
+  end apply
+end EdmondsKarp
